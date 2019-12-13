@@ -110,12 +110,13 @@ class NsubjIsAttribute(Rule):
 #     a) aIm -> obj + poddrzewa  lub aIm -> iobj + poddrzewa
 class ObjsFromAimAreObjects(Rule):
     def apply(self, tree: LexicalTree, annotations: List[IGTag]):
-        if find_word_igelement(annotations, tree.id) != IGElement.AIM:
+        aim_node = find_node_with_tag(annotations, tree, IGElement.AIM)
+        if aim_node is None:
             return
 
-        for c in tree.children:
-            if c.relation in ["obj", "dobj", "obl"]:
-                annotations.append(IGTag(words = [(c.id, c.value)], tag_name = IGElement.OBJECT))
+        for c in aim_node.children:
+            if c.relation in ["obj", "iobj"]:
+                annotations.append(IGTag(words = [(cc.id, cc.value) for cc in c.get_all_descendants()], tag_name = IGElement.OBJECT) )
 
 
 class PunctFromAimIsSeparator(Rule):
